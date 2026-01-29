@@ -1,13 +1,13 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 
 export default function Home() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: { preventDefault: () => void; stopPropagation: () => void; }) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -327,6 +327,7 @@ export default function Home() {
           color: #00376b;
           font-size: 13px;
           text-decoration: none;
+          transition: color 0.2s ease;
         }
 
         .forgot-password a:hover {
@@ -475,7 +476,7 @@ export default function Home() {
           font-size: 12px;
         }
 
-        /* Mobile responsive */
+        /* ===== MOBILE RESPONSIVE ===== */
         @media (max-width: 875px) {
           .left-side {
             display: none;
@@ -483,6 +484,176 @@ export default function Home() {
           
           .main-container {
             justify-content: center;
+            padding: 0;
+          }
+
+          .right-side {
+            padding: 10px;
+            width: 100%;
+          }
+
+          .login-container {
+            max-width: 100%;
+          }
+
+          .login-box {
+            padding: 20px 15px;
+            border: none;
+            background: transparent;
+          }
+
+          .login-title {
+            font-size: 16px;
+            margin-bottom: 20px;
+          }
+
+          .input-field {
+            font-size: 16px; /* Prevents zoom on iOS */
+            padding: 10px;
+          }
+
+          .show-password {
+            font-size: 13px;
+          }
+
+          .login-button {
+            padding: 12px;
+            font-size: 14px;
+          }
+
+          .facebook-login {
+            padding: 15px 20px;
+            border: none;
+            background: transparent;
+          }
+
+          .signup-box {
+            padding: 20px;
+            border: none;
+            background: transparent;
+          }
+
+          .get-app {
+            margin-top: 15px;
+          }
+
+          .get-app p {
+            font-size: 13px;
+            margin-bottom: 12px;
+          }
+
+          .app-buttons {
+            flex-direction: row;
+            gap: 6px;
+          }
+
+          .app-button {
+            height: 35px;
+            width: auto;
+            max-width: 130px;
+          }
+
+          .footer-links {
+            gap: 8px;
+            margin-top: 20px;
+            padding: 0 10px;
+          }
+
+          .footer-links a {
+            font-size: 11px;
+          }
+
+          .language-selector,
+          .copyright {
+            font-size: 11px;
+          }
+
+          .meta-footer {
+            margin-top: 20px;
+          }
+        }
+
+        /* Extra small phones (iPhone SE, etc) */
+        @media (max-width: 400px) {
+          .right-side {
+            padding: 5px;
+          }
+
+          .login-box {
+            padding: 15px 10px;
+          }
+
+          .login-title {
+            font-size: 15px;
+          }
+
+          .input-field {
+            font-size: 16px;
+            padding: 9px;
+          }
+
+          .facebook-login,
+          .signup-box {
+            padding: 15px 10px;
+          }
+
+          .app-buttons {
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+          }
+
+          .app-button {
+            max-width: 140px;
+            width: 100%;
+          }
+
+          .footer-links a {
+            font-size: 10px;
+          }
+        }
+
+        /* Landscape mobile */
+        @media (max-height: 600px) and (orientation: landscape) {
+          .main-container {
+            min-height: auto;
+          }
+
+          .right-side {
+            padding: 15px 10px;
+          }
+
+          .login-box {
+            padding: 15px;
+          }
+
+          .login-title {
+            margin-bottom: 15px;
+          }
+
+          .get-app,
+          .meta-footer,
+          .footer-links {
+            margin-top: 15px;
+          }
+        }
+
+        /* Tablet */
+        @media (min-width: 768px) and (max-width: 875px) {
+          .login-box {
+            border: 1px solid #262626;
+            background: #0a0a0a;
+            padding: 35px 30px;
+          }
+
+          .facebook-login {
+            border: 1px solid #262626;
+            background: #0a0a0a;
+          }
+
+          .signup-box {
+            border: 1px solid #262626;
+            background: #0a0a0a;
           }
         }
       `}</style>
